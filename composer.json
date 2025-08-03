@@ -27,10 +27,11 @@
     },
     "require-dev": {
         "orchestra/testbench": "^10.4",
-        "laravel/pint": "^1.24"
+        "laravel/pint": "^1.24",
+        "phpstan/phpstan": "^2.1"
     },
     "scripts": {
-        "lint": "vendor/bin/pint",
+        "lint": "vendor/bin/pint && vendor/bin/phpstan analyse",
         "test": "vendor/bin/phpunit"
     }
 }
