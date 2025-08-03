@@ -2,9 +2,9 @@
 
 namespace Petersuhm\Ogkit\Tests\Feature;
 
-use PHPUnit\Framework\Attributes\Test;
 use Orchestra\Testbench\TestCase;
 use Petersuhm\Ogkit\OgkitServiceProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class ServiceProviderTest extends TestCase
 {
