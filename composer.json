@@ -1,0 +1,34 @@
+{
+    "name": "petersuhm/ogkit-laravel",
+    "description": "Dynamic open graph images for your Laravel app with HTML and CSS",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Petersuhm\\Ogkit\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Peter Suhm",
+            "email": "peter@suhm.dk"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Petersuhm\\Ogkit\\OgkitServiceProvider"
+            ]
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.4"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
+}
