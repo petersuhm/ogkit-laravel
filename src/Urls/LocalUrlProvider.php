@@ -6,16 +6,18 @@ final class LocalUrlProvider implements UrlProvider
 {
     public function __construct(private string $route = 'ogkit.image') {}
 
-    public function imageUrl(string $renderUrl, string $variant, array $opts = []): string
+    public function imageUrl(string $renderUrl, string $variant, array $options = []): string
     {
-        $w = $opts['w'] ?? 1200; $h = $opts['h'] ?? 630;
+        $width = $options['w'] ?? 1200;
+        $height = $options['h'] ?? 630;
+        $format = $options['fmt'] ?? 'jpeg';
 
         return route($this->route, [
             'v' => $variant,
             'r' => $this->compact($renderUrl),
-            'w' => $w,
-            'h' => $h,
-            'f' => $opts['fmt'] ?? 'jpeg',
+            'w' => $width,
+            'h' => $height,
+            'f' => $format,
         ]);
     }
 

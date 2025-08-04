@@ -4,21 +4,21 @@ namespace Petersuhm\Ogkit\Support;
 
 final class VariantHasher
 {
-    public function __construct(private string $algo = 'sha1') {}
-
-    public function hash(string $path, array $data, array $opts): string
+    public function hash(string $path, array $data, array $options): string
     {
-        $w = $opts['w'] ?? 1200; $h = $opts['h'] ?? 630; $fmt = $opts['fmt'] ?? 'jpeg';
+        $width = $options['w'] ?? 1200;
+        $height = $options['h'] ?? 630;
+        $format = $options['fmt'] ?? 'jpeg';
 
         $payload = [
             'p' => ltrim($path, '/'),
             'd' => $this->normalize($data),
-            'w' => (int) $w,
-            'h' => (int) $h,
-            'f' => $fmt,
+            'w' => (int) $width,
+            'h' => (int) $height,
+            'f' => $format,
         ];
 
-        return hash($this->algo, json_encode($payload, JSON_UNESCAPED_SLASHES));
+        return hash('sha1', json_encode($payload, JSON_UNESCAPED_SLASHES));
     }
 
     private function normalize(array $data): array

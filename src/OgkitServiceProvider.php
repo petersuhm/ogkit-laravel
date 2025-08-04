@@ -4,7 +4,6 @@ namespace Petersuhm\Ogkit;
 
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Blade;
 
 class OgkitServiceProvider extends ServiceProvider
 {
@@ -48,11 +47,6 @@ class OgkitServiceProvider extends ServiceProvider
         AboutCommand::add('ogkit', fn () => ['Version' => '0.0.1']);
 
         $this->registerRoutes();
-
-        Blade::directive('ogimage', function ($expr) {
-            // Usage: @ogimage('/posts/'.$post->slug, ['title' => $post->title])
-            return "<?php echo e(\\Petersuhm\\Ogkit\\Facades\\OgImage::url(...$expr)); ?>";
-        });
     }
 
     public function registerRoutes(): void

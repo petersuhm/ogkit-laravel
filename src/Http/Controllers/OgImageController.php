@@ -9,7 +9,7 @@ use Petersuhm\Ogkit\Support\ImageGenerator;
 
 final class OgImageController extends Controller
 {
-    public function __invoke(Request $request, ImageGenerator $gen)
+    public function __invoke(Request $request, ImageGenerator $generator)
     {
         $request->validate([
             'v' => 'required|string',
@@ -20,34 +20,48 @@ final class OgImageController extends Controller
         ]);
 
         $variant = $request->string('v');
-        $w = (int) $request->input('w', 1200);
-        $h = (int) $request->input('h', 630);
-        $fmt = $request->input('f', 'jpeg');
+        $width = (int) $request->input('w', 1200);
+        $height = (int) $request->input('h', 630);
+        $format = $request->input('f', 'jpeg');
         $renderUrl = $this->expand($request->string('r'));
 
         $disk = config('ogkit.disk', 'local');
-        $key  = "ogkit/{$variant}.{$w}x{$h}.{$fmt}";
+        $key  = "ogkit/{$variant}.{$width}x{$height}.{$format}";
 
-        if (! Storage::disk($disk)->exists($key)) {
-            $tmp = tempnam(sys_get_temp_dir(), 'og_') . ".{$fmt}";
-            $gen->capture($renderUrl, $tmp, $w, $h, $fmt);
-            Storage::disk($disk)->put($key, fopen($tmp, 'rb'));
-            @unlink($tmp);
+        // USE SOME SORT OF CALLBACK MAGIC TO CLEAN UP THE TEMP FILE
+        if ($this->shouldCapture($disk, $key)) {
+            $tmpFile = tempnam(sys_get_temp_dir(), 'og_') . ".{$format}";
+
+            $generator->capture($renderUrl, $tmpFile, $width, $height, $format);
+
+            Storage::disk($disk)->put($key, fopen($tmpFile, 'rb'));
+
+            @unlink($tmpFile);
         }
 
+        // WHY DOES THIS NEED TO STREAM?
         return response()->stream(function () use ($disk, $key) {
             $s = Storage::disk($disk)->readStream($key);
-            fpassthru($s); fclose($s);
+            fpassthru($s);
+            fclose($s);
         }, 200, [
-            'Content-Type' => "image/{$fmt}",
+            'Content-Type' => "image/{$format}",
             'Cache-Control' => 'public, max-age=31536000, immutable',
         ]);
+    }
+
+    private function shouldCapture(string $disk, string $key): bool
+    {
+        return ! Storage::disk($disk)->exists($key);
     }
 
     private function expand(string $b64url): string
     {
         $pad = strlen($b64url) % 4;
-        if ($pad) $b64url .= str_repeat('=', 4 - $pad);
+
+        if ($pad) {
+            $b64url .= str_repeat('=', 4 - $pad);
+        }
 
         return base64_decode(strtr($b64url, '-_', '+/'));
     }

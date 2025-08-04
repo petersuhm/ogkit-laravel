@@ -14,11 +14,11 @@ final class OgImageService
         private VariantHasher $hasher
     ) {}
 
-    public function url(string $path, array $data = [], array $opts = []): string
+    public function url(string $path, array $data = [], array $options = []): string
     {
         $renderUrl = $this->render->build($path, $data);
-        $variant = $this->hasher->hash($path, $data, $opts);
+        $variant = $this->hasher->hash($path, $data, $options);
 
-        return $this->urls->imageUrl($renderUrl, $variant, $opts);
+        return $this->urls->imageUrl($renderUrl, $variant, $options);
     }
 }
