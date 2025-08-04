@@ -8,21 +8,23 @@ final class LocalUrlProvider implements UrlProvider
 
     public function imageUrl(string $renderUrl, string $variant, array $options = []): string
     {
-        $width = $options['w'] ?? 1200;
-        $height = $options['h'] ?? 630;
-        $format = $options['fmt'] ?? 'jpeg';
-
-        return route($this->route, [
+        $payload = [
             'v' => $variant,
-            'r' => $this->compact($renderUrl),
-            'w' => $width,
-            'h' => $height,
-            'f' => $format,
-        ]);
+            'url' => $renderUrl,
+            'w' => (int) ($options['w'] ?? 1200),
+            'h' => (int) ($options['h'] ?? 630),
+            'fmt' => $options['fmt'] ?? 'jpeg',
+        ];
+
+        return route($this->route, ['t' => $this->pack($payload)]);
     }
 
-    private function compact(string $url): string
+    private function pack(array $payload): string
     {
-        return rtrim(strtr(base64_encode($url), '+/', '-_'), '=');
+        ksort($payload);
+
+        $json = json_encode($payload, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+
+        return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
     }
 }

@@ -17,7 +17,7 @@ final class OgImageService
     public function url(string $path, array $data = [], array $options = []): string
     {
         $renderUrl = $this->render->build($path, $data);
-        $variant = $this->hasher->hash($path, $data, $options);
+        $variant = $data['v'] ?? $this->hasher->hash($path, $options);
 
         return $this->urls->imageUrl($renderUrl, $variant, $options);
     }
