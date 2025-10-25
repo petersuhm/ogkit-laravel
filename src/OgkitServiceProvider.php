@@ -2,8 +2,14 @@
 
 namespace Petersuhm\Ogkit;
 
+include_once __DIR__ . '/helpers.php';
+
 use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\ServiceProvider;
+use Petersuhm\Ogkit\Urls\UrlProvider;
+use Petersuhm\Ogkit\Urls\LocalUrlProvider;
+use Petersuhm\Ogkit\Services\OgImageService;
+use Illuminate\Support\Facades\Blade;
 
 class OgkitServiceProvider extends ServiceProvider
 {
@@ -12,7 +18,10 @@ class OgkitServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->mergeConfigFrom(__DIR__.'/../config/ogkit.php', 'ogkit');
+
+        $this->app->bind(UrlProvider::class, LocalUrlProvider::class);
+        $this->app->singleton('ogkit.service', OgImageService::class);
     }
 
     /**
@@ -21,5 +30,17 @@ class OgkitServiceProvider extends ServiceProvider
     public function boot(): void
     {
         AboutCommand::add('ogkit', fn () => ['Version' => '0.0.1']);
+
+        $this->registerRoutes();
+
+        Blade::directive('ogimage', function ($expression) {
+            // Usage: @ogimage('/posts/'.$post->slug, ['title' => $post->title])
+            return "<?php echo e(call_user_func_array([\\Petersuhm\\Ogkit\\Facades\\OgImage::class, 'url'], [{$expression}])); ?>";
+        });
+    }
+
+    public function registerRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }
 }
